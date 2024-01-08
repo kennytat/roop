@@ -90,6 +90,8 @@ def process_image(source_path: str, target_path: str, output_path: str) -> None:
     reference_face = None if roop.globals.many_faces else get_one_face(target_frame, roop.globals.reference_face_position)
     result = process_frame(source_face, reference_face, target_frame)
     cv2.imwrite(output_path, result)
+    from roop.processors.frame.face_enhancer import process_image as enhance_image
+    enhance_image(source_path=output_path, target_path=output_path, output_path=output_path)
 
 
 def process_video(source_path: str, temp_frame_paths: List[str]) -> None:
@@ -98,3 +100,8 @@ def process_video(source_path: str, temp_frame_paths: List[str]) -> None:
         reference_face = get_one_face(reference_frame, roop.globals.reference_face_position)
         set_face_reference(reference_face)
     roop.processors.frame.core.process_video(source_path, temp_frame_paths, process_frames)
+    from roop.processors.frame.face_enhancer import process_video as enhance_video
+    enhance_video(source_path=source_path, temp_frame_paths=temp_frame_paths)
+
+def post_process():
+    print("post_process face_swapper called::")
