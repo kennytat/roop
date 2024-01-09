@@ -17,19 +17,20 @@ THREAD_SEMAPHORE = threading.Semaphore()
 THREAD_LOCK = threading.Lock()
 NAME = 'ROOP.FACE-ENHANCER'
 
-# background enhancer with RealESRGAN
-model = SRVGGNetCompact(num_in_ch=3, num_out_ch=3, num_feat=64, num_conv=32, upscale=4, act_type='prelu')
-half = True if torch.cuda.is_available() else False
-upsampler = RealESRGANer(scale=4, model_path=resolve_relative_path('../models/realesr-general-x4v3.pth'), model=model, tile=0, tile_pad=10, pre_pad=0, half=half)
 
 def get_face_enhancer() -> Any:
     global FACE_ENHANCER
 
+    # background enhancer with RealESRGAN
+    realesrgan_model = SRVGGNetCompact(num_in_ch=3, num_out_ch=3, num_feat=64, num_conv=32, upscale=4, act_type='prelu')
+    half = True if torch.cuda.is_available() else False
+    upsampler = RealESRGANer(scale=4, model_path=resolve_relative_path('../models/realesr-general-x4v3.pth'), model=realesrgan_model, tile=0, tile_pad=10, pre_pad=0, half=half)
+
     with THREAD_LOCK:
         if FACE_ENHANCER is None:
-            model_path = resolve_relative_path('../models/GFPGANv1.4.pth')
+            gfpgan_model = resolve_relative_path('../models/GFPGANv1.4.pth')
             # todo: set models path -> https://github.com/TencentARC/GFPGAN/issues/399
-            FACE_ENHANCER = GFPGANer(model_path=model_path, upscale=2, arch='clean', channel_multiplier=2, device=get_device(), bg_upsampler=upsampler)
+            FACE_ENHANCER = GFPGANer(model_path=gfpgan_model, upscale=2, arch='clean', channel_multiplier=2, device=get_device(), bg_upsampler=upsampler)
     return FACE_ENHANCER
 
 
@@ -86,7 +87,6 @@ def process_frames(source_path: str, temp_frame_paths: List[str], update: Callab
         cv2.imwrite(temp_frame_path, result)
         if update:
             update()
-
 
 def process_image(source_path: str, target_path: str, output_path: str) -> None:
     target_frame = cv2.imread(target_path, cv2.IMREAD_UNCHANGED)
