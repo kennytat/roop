@@ -1,0 +1,26 @@
+version: "3.8"
+services:
+  soni:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: kennytat/faceswap:stable
+    container_name: faceswap
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    # shm_size: 1024m
+    restart: unless-stopped
+    ports:
+      - 7890:7890
+    # environment:
+    #   AUTH_USER: ""
+    #   AUTH_PASS: ""
+    volumes:
+      - /mnt/backup/AI/roop/models:/app/models
+      - /mnt/backup/AI/roop/gfpgan:/app/gfpgan
+      - /mnt/backup/AI/roop/insightface:/root/.insightface

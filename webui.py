@@ -50,7 +50,7 @@ def web_interface():
                       with gr.Row():
                         source_image = gr.Image(type="filepath", label="Source Face")
                       with gr.Row():
-                        input_files = gr.Files(label="Target image", file_types=["image"])
+                        input_files = gr.Files(label="Target images (batch)", file_types=["image"])
                   with gr.Column():
                       with gr.Row():
                         files_output = gr.Files(label="PROGRESS BAR")
